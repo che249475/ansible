@@ -8,7 +8,7 @@
   gather_facts: false
 
   tasks:
-  - name: ШАГ 1 - Создание позователя '{{ username }}'
+  - name: ШАГ 1 - Создание пользователя '{{ username }}'
     user:
      name: '{{ username }}'
      password: "{{ password | password_hash('sha512') }}"
@@ -45,10 +45,10 @@
 
      comment: 'Created with ansible'
 
-  - name: ШАГ 2 - Настройка мандатного контроля целостности (МКЦ) для позователя '{{ username }}'
+  - name: ШАГ 2 - Настройка мандатного контроля целостности (МКЦ) для пользователя '{{ username }}'
     # astra-mic-control
     shell: pdpl-user '{{ username }}' -i 63
 
-  - name: ШАГ 3 - Настройка уровня конфиденциальности для позователя '{{ username }}'
+  - name: ШАГ 3 - Настройка уровня конфиденциальности для пользователя '{{ username }}'
     # astra-mac-control
     shell: usermac -c 0:0 '{{ username }}'
