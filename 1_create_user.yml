@@ -41,7 +41,7 @@
 
      # password_expire_max: Maximum number of days between password change
      # Does not work on ansible 2.7.7 and python 3.7.3 :(
-     # password_expire_max: 120
+     password_expire_max: 120
 
      comment: 'Created with ansible'
 
