@@ -1,0 +1,18 @@
+---
+- name: Shutdown linux servers
+  gather_facts: true
+  hosts: staging_servers
+  serial: 10
+  become: true
+
+
+  tasks:
+
+    - name: Shutdown multiple hosts
+      community.general.shutdown:
+        delay: 5
+        msg: "System going down in 5 seconds"
+
+        # search_paths:
+        #  - '/lib/molly-guard' # Reboot a machine with shutdown command in unusual place
+        # msg: "System shutdown time has arrived"

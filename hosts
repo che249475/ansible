@@ -1,0 +1,75 @@
+# Сервер Ansible:
+#localhost    ansible_connection=local    ansible_user=berezinve
+
+# Подготовительные (тестовые) серверы:
+[staging_servers]
+172.16.249.124  owner=VEB
+#172.16.249.116  owner=BVE
+
+[standalone]
+172.16.249.98
+
+[iassc_servers]
+10.255.81.11
+10.255.81.13
+
+[site_lb]
+192.168.1.132
+
+[site_web]
+192.168.1.130
+192.168.1.131
+
+# It's a common practice NOT to store variables in an inventory file.
+# Instead you can move the following vars to a special file ~/ansible/group_vars/staging_servers
+# Do not forget to change equal sign (=) to colons (:)
+#[staging_servers:vars]
+#ansible_user=berezinve
+#ansible_ssh_private_key_file=/home/berezinve/.ssh/id_rsa
+#ansible_become_pass=berezinve
+
+# Производственные серверы:
+[video_ALL:children]
+video_ANALYTICS
+video_INFRASTRUCTURE_AND_S3_STORAGE
+video_RETRANSMITTERS
+video_MONITORING
+video_PLATFORM
+video_APP_MAPS
+video_ANALYTICS_GRZ
+video_APP_FIND_FACE
+video_DETECTORS_AND_EXTRACTORS
+video_TBO
+
+[video_ANALYTICS]
+172.16.140.[2:11]
+172.16.140.[18:23]
+172.16.140.[32:35]
+
+[video_INFRASTRUCTURE_AND_S3_STORAGE]
+172.16.140.12
+
+[video_RETRANSMITTERS]
+172.16.140.[13:17]
+172.16.140.[41:45]
+
+[video_MONITORING]
+172.16.140.24
+
+[video_PLATFORM]
+172.16.140.[29:30]
+
+[video_APP_MAPS]
+172.16.140.31
+
+[video_ANALYTICS_GRZ]
+172.16.140.[36:38]
+
+[video_APP_FIND_FACE]
+172.16.140.25
+
+[video_DETECTORS_AND_EXTRACTORS]
+172.16.140.[26:28]
+
+[video_TBO]
+172.16.140.[39:40]

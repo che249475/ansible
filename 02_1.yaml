@@ -1,0 +1,120 @@
+---
+
+- name: Playbook for Web Services initialization
+  gather_facts: true
+  hosts: site_web
+  serial: 7
+  become: true
+
+  tasks:
+     - name: Install the OS packages
+       ansible.builtin.apt:
+         name:
+           - python-setuptools
+           - nginx
+           - git
+           - python3
+           - python3-pip
+         state: present
+         update_cache: yes
+
+     - name: Add user for UUID service
+       ansible.builtin.user:
+         name: uuid
+         shell: /bin/bash
+         create_home: true
+
+     - name: Clone UUID repository
+       ansible.builtin.git:
+         repo: https://github.com/unix-way-project/uuid-service.git
+         dest: /home/uuid/uuid-service
+         version: main
+         update: false
+       notify:
+         - Restart UUID
+
+     - name: Set permissions on UUID project
+       ansible.builtin.file:
+         path: /home/uuid/uuid-service
+         state: directory
+         recurse: yes
+         owner: uuid
+         group: uuid
+
+     - name: Install Python packages for UUID project
+       ansible.builtin.pip:
+         requirements: /home/uuid/uuid-service/sources/requirements.txt
+         state: present
+         executable: pip3
+       notify:
+         - Restart UUID
+
+     - name: Install Python packages for running UUID project
+       ansible.builtin.pip:
+         name:
+           - uwsgi
+         state: present
+         executable: pip3
+
+     - name: Copy uwsgi configuration
+       ansible.builtin.copy:
+         src: /home/berezinve/ansible_project/ansible_project/roles/common/files/uwsgi.ini
+         dest: /home/uuid/uwsgi.ini
+         owner: uuid
+         group: uuid
+         mode: u+rw,g=rw,o=
+       notify:
+         - Restart UUID
+
+     - name: Copy systemd service for UUID service
+       ansible.builtin.copy:
+         src: /home/berezinve/ansible_project/ansible_project/roles/common/files/uuid.service
+         dest: /usr/lib/systemd/system
+         owner: root
+         group: root
+         mode: u+rw,g=rw,o=
+       notify:
+         - Restart UUID
+
+     - name: Start UUID service
+       ansible.builtin.systemd:
+         state: started
+         enabled: yes
+         daemon_reload: yes
+         name: uuid
+
+     - name: Add nginx an access to uwsgi socket
+       ansible.builtin.user:
+         name: www-data
+         groups: uuid
+         append: yes
+       notify:
+         - Restart Nginx
+
+     - name: Copy nginx configuration for UUID service
+       ansible.builtin.copy:
+         src: /home/berezinve/ansible_project/ansible_project/roles/common/files/nginx.conf
+         dest: /etc/nginx/conf.d/uuid.conf
+         owner: root
+         group: root
+         mode: u+rw,g=rw,o=
+       notify:
+         - Restart Nginx
+
+     - name: Start nginx service
+       ansible.builtin.systemd:
+         state: started
+         enabled: yes
+         daemon_reload: yes
+         name: nginx
+
+  handlers:
+   - name: Restart Nginx
+     ansible.builtin.service:
+       name: nginx
+       state: restarted
+
+   - name: Restart UUID
+     ansible.builtin.service:
+       name: uuid
+       state: restarted

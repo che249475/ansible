@@ -1,0 +1,26 @@
+---
+- name: Gather facts about drives
+  hosts: video_ALL
+#  hosts: 172.16.140.3
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Copy MegaRAID 9560-8i 4GB CLI binary
+      ansible.builtin.copy:
+        src:  /home/berezinve/ansible_project/roles/common/files/storcli64
+        dest: /home/berezinve/storcli64
+        owner: berezinve
+        group: root
+        mode: u+rwx,g=rw,o=
+
+    - name: Run a command that uses non-posix shell-isms (in this example /bin/sh doesn't handle redirection and wildcards together but bash does)
+#      ansible.builtin.shell: /home/berezinve/storcli64 /c0 show > /tmp/$(hostname -I | cut -f1 -d' ')_storecli
+      ansible.builtin.shell: /home/berezinve/storcli64 /c0 show > /tmp/storecli
+      args:
+        executable: /bin/bash
+
+    - name: Fetch files from remote nodes
+      ansible.builtin.fetch:
+        src:  /tmp/storecli
+        dest: /home/berezinve/ansible_project/RAID/storcli-{{ inventory_hostname }}
+        flat: yes

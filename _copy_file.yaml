@@ -1,0 +1,32 @@
+---
+
+- name: Install, configure, enable and start x11vnc server
+#  hosts: staging_servers
+  hosts: video_RETRANSMITTERS
+  become: true
+
+  vars:
+    source_file:       ./roles/common/files/x11vnc.service
+    destination_file:  /etc/systemd/system/x11vnc.service
+
+
+  tasks:
+
+  - name: Install x11vnc server
+    ansible.builtin.apt:  name=x11vnc state=latest
+
+  - name: Copy x11vnc server config file with backup
+    ansible.builtin.copy:
+      src: "{{ source_file }}"
+      dest: "{{ destination_file }}"
+      backup: true
+      owner: root
+      group: root
+      mode: "0644"
+
+  - name: Restart x11vnc service, also issue daemon-reload to pick up config changes
+    ansible.builtin.systemd_service:
+      state: restarted
+      enabled: true
+      daemon_reload: true
+      name: x11vnc

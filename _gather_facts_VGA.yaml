@@ -1,0 +1,22 @@
+---
+- name: Gather and display specific facts
+  hosts: video_ALL
+#  hosts: 172.16.140.2
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Get hardware information
+      shell: "lspci -nn"
+      register: output
+
+    - name: Print output
+      debug:
+        msg: "{{ output.stdout }}"
+
+    - name: Get video card info
+      shell: "lspci -nn | grep VGA" # Выбираем только информацию о видеокарте
+      register: output_vga
+
+    - name: Print video card info
+      debug:
+        msg: "{{ output_vga.stdout }}"

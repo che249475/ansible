@@ -1,0 +1,39 @@
+---
+# Ansible will display the gathered facts, which can be extensive.
+# Filtering specific facts can make this more manageable.
+#
+#$ ansible staging_servers -m setup -a "filter=ansible_distribution"
+#
+# 172.16.140.12 | SUCCESS => {
+#     "ansible_facts": {
+#         "ansible_distribution": "Astra Linux",
+#         "discovered_interpreter_python": "/usr/bin/python3.11"
+#     },
+#     "changed": false
+
+- name: Gather and display specific facts
+#  hosts: video_ALL
+  hosts: 172.16.140.25
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Show number of processor cores (Display the IP address)
+      ansible.builtin.debug:
+        var: ansible_facts['processor_cores']
+#       var: ansible_facts['default_ipv4']['address']
+
+    - name: Show number of processors
+      ansible.builtin.debug:
+        var: ansible_facts['processor_count']
+
+    - name: Show processor_nproc
+      ansible.builtin.debug:
+        var: ansible_facts['processor_nproc']
+
+    - name: Show threads per core
+      ansible.builtin.debug:
+        var: ansible_facts['processor_threads_per_core']
+
+    - name: Show total proc
+      ansible.builtin.debug:
+        var: ansible_facts['processor_vcpus']

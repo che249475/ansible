@@ -1,0 +1,32 @@
+server {
+    listen		*:80;
+    server_name		{{ sitename }}.edu35.ru;
+    root		/srv/users/{{ sitename }}/www/;
+    index		index.php index.html index.htm default.html default.htm;
+    error_log		/srv/users/{{ sitename }}/log/nginx.error.log error;
+
+    location / {
+	try_files	$uri $uri/ /index.php?$args;
+    }
+
+    location /administrator {
+	try_files	$uri $uri/ /index.php?$args;
+	auth_basic "Restricted area";
+	auth_basic_user_file /srv/users/{{ sitename }}/local/htpasswd;
+    }
+
+    location ~* /(images|cache|media|logs|tmp)/.*\.(php|pl|py|jsp|asp|sh|cgi)$ {
+	return		403;
+	error_page	403	/403_error.html;
+        }
+
+    location ~ \.php$ {
+	fastcgi_pass	unix:/var/run/php7.0-fpm-{{ sitename }}.sock;
+	include		fastcgi.conf;
+	include		snippets/fastcgi-php.conf;
+    }
+
+    location ~ /\.ht {
+	deny all;
+    }
+}

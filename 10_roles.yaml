@@ -1,0 +1,10 @@
+---
+
+- name: Install nginx and upload my web page
+  hosts: 192.168.1.130
+  become: true
+
+  roles:
+    - { role: deploy_nginx, when: ansible_system == 'Linux' }
+#    - deploy_nginx
+#    - deploy_postgresql

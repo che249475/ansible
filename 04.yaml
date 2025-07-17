@@ -1,0 +1,23 @@
+---
+
+- name: Playbook for Common Initialization
+  gather_facts: true
+  hosts: staging_servers
+  serial: 5
+  become: true
+
+  tasks:
+     - name: Install the OS packages in Debian
+       ansible.builtin.apt:
+         name:
+           - nmap
+         state: present
+         update_cache: yes
+       when: ansible_facts['pkg_mgr'] == "apt"
+
+     - name: Install the OS packages in CentOS
+       ansible.builtin.yum:
+         name:
+           - nmap
+         state: present
+       when: ansible_facts['pkg_mgr'] == "yum"

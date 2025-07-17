@@ -1,0 +1,41 @@
+---
+
+- block:   #========= Block for RedHat =========#
+
+    - name: 1.1 - Install nginx Web Server for RedHat
+      yum:  name=httpd state=latest
+
+    - name: 1.2 - Start httpd service for RedHat and enable it on every boot
+      service:  name=httpd state=started enabled=true
+
+  when: ansible_os_family == "RedHat"
+
+
+- block:   #========= Block for Debian =========#
+
+    - name: 1.3 - Install nginx Web Server for Debian
+      apt:  name=nginx state=latest
+
+    - name: 1.4 - Start nginx service for Debian and enable it on every boot
+      service:  name=nginx state=started enabled=true
+
+  when: ansible_os_family == "Astra Linux"
+
+
+
+- name: 2 - Generate 'index.html'
+  template: src=index.j2 dest={{ destin_folder }}/index.html mode=0555
+  notify:
+    - Restart nginx RedHat
+    - Restart nginx Astra Linux
+
+
+- name: 3 - Copy ./MyWebSite2 directory to Web Server
+  copy: src={{ item }} dest={{ destin_folder }} mode=0555
+  loop:
+    - "pic1.png"
+    - "pic2.png"
+    - "pic3.png"
+  notify:
+    - Restart nginx RedHat
+    - Restart nginx Astra Linux

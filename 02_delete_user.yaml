@@ -1,0 +1,33 @@
+---
+
+- name: Delete user playbook
+  hosts: staging_servers
+  become: true
+  gather_facts: false
+
+
+  vars:
+    username: del_me
+
+
+  tasks:
+
+  - name: 2 - Delete user and group
+    user:
+      name: "{{ username }}"
+
+      # Whether the account should exist or not, taking action if the state is different
+      # from what is stated.
+      state: absent
+
+      # If true, add the user to the groups specified in groups. If false, user will only
+      # be added to the groups specified in groups, removing them from all other groups.
+      append: false
+
+      # This only affects state=absent, it attempts to remove directories associated with the user.
+      # The behavior is the same as userdel --remove, check the man page for details and support.
+      remove: yes
+
+      # create_home: Unless set to false, a home directory will be made for the user
+      # when the account is created or if the home directory does not exist.
+      create_home: false

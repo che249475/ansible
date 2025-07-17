@@ -1,0 +1,37 @@
+---
+
+- name: Install, configure, enable and start x11vnc server
+#  hosts: staging_servers
+  hosts: 172.16.140.43
+  become: true
+
+  vars:
+    source_file:       ./roles/common/files/x11vnc.service
+    destination_file:  /etc/systemd/system/x11vnc.service
+
+
+  tasks:
+
+  - name: Install x11vnc server
+    ansible.builtin.apt:  name=x11vnc state=latest
+
+  - name: Copy x11vnc server config file with backup
+    ansible.builtin.copy:
+      src: "{{ source_file }}"
+      dest: "{{ destination_file }}"
+      backup: true
+      owner: root
+      group: root
+      mode: "0644"
+    notify: Restart x11vnc server
+
+#  - name: Copy x11vnc server config file to remote hosts
+#    copy: src={{ source_file }} dest={{ destination_file }} mode=0644
+#    notify: Restart x11vnc server
+
+  - name: Start x11vnc service and enable it on every boot
+    ansible.builtin.service:  name=x11vnc state=started enabled=true
+
+  handlers:
+  - name: Restart x11vnc server
+    ansible.builtin.service: name=x11vnc state=restarted

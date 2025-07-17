@@ -1,0 +1,11 @@
+---
+
+- name: Gather and display specific facts
+  hosts: video_ALL
+#  hosts: 172.16.140.2
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Show motherboard name
+      ansible.builtin.debug:
+        var: ansible_facts['board_name']

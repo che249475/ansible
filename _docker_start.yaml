@@ -1,0 +1,25 @@
+---
+- name: Start docker containers
+  hosts: staging_servers
+  become: true
+
+
+  tasks:
+
+    - name: Start MYSQL docker container
+      community.docker.docker_container:
+        name: mein_mysql
+        image: mysql
+        state: started
+
+    - name: Start NGINX docker container
+      community.docker.docker_container:
+        name: mein_nginx
+        image: nginx
+        state: started
+
+
+#    - name: Remove container
+#      community.docker.docker_container:
+#        name: ohno
+#        state: absent

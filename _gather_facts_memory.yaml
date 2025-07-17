@@ -1,0 +1,45 @@
+---
+# Ansible will display the gathered facts, which can be extensive.
+# Filtering specific facts can make this more manageable.
+#
+#$ ansible staging_servers -m setup -a "filter=ansible_distribution"
+#
+# 172.16.140.12 | SUCCESS => {
+#     "ansible_facts": {
+#         "ansible_distribution": "Astra Linux",
+#         "discovered_interpreter_python": "/usr/bin/python3.11"
+#     },
+#     "changed": false
+
+- name: Gather and display specific facts
+#  hosts: video_ALL
+  hosts: 172.16.140.26
+  gather_facts: true
+  become: true
+  tasks:
+     - name: Install the OS packages in Debian
+       ansible.builtin.apt:
+         name:
+           - dmidecode
+         state: present
+         update_cache: yes
+       when: ansible_facts['pkg_mgr'] == "apt"
+
+     - name: Install the OS packages in CentOS
+       ansible.builtin.yum:
+         name:
+           - dmidecode
+         state: present
+       when: ansible_facts['pkg_mgr'] == "yum"
+
+     - name: Return memory info to registered var
+       ansible.builtin.command: dmidecode -t memory
+       register: mem_info
+
+     - name: Print final output
+       debug:
+         var: mem_info
+
+     - name: Show total memory
+       ansible.builtin.debug:
+         var: ansible_facts['memtotal_mb']

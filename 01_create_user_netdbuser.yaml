@@ -1,0 +1,77 @@
+---
+
+- name: Create user playbook
+
+  # gather_facts: Gathers facts about remote hosts
+  #               (equivalent to ansible.builtin.setup module)
+  gather_facts: false
+
+  hosts: standalone
+
+  # By default, Ansible runs each task on all hosts affected by a play before
+  # starting the next task on any host, using 5 forks. If you want to change
+  # this default behavior, you can use a different strategy plugin, change the
+  # number of forks, or apply one of several keywords like "serial"
+  # serial: 4
+
+  # become: Run operations with become (does not imply password prompting)
+  # If you need to ask for privilege escalation password, use --ask-become-pass
+  become: true
+
+
+  vars:
+    username: netdbuser
+    password: 1Uhe:bhEujNt[
+    uid: 1003
+    # ansible_become_password: "berezinve"
+
+
+  tasks:
+  - name: ШАГ 1 - Создание пользователя '{{ username }}'
+    ansible.builtin.user:
+     name: '{{ username }}'
+     password: "{{ password | password_hash('sha512') }}"
+     shell: /bin/bash
+
+     # create_home: Unless set to false, a home directory will be made for the user
+     # when the account is created or if the home directory does not exist.
+     create_home: true
+
+     # home: Optionally sets the user's home directory
+     home: '/home/{{ username }}/'
+
+     # update_password: always - will update passwords if they differ.
+     # update_password: on_create - will only set the password for newly created users.
+     update_password: on_create
+
+     # uid: Optionally sets the UID of the user
+     uid: '{{ uid }}'
+
+     # List of groups of which the user is a member
+     groups: astra-admin
+
+     # Whether the account should exist or not, taking action if the state is different
+     #from what is stated.
+     state: present
+
+     # If true, add the user to the groups specified in groups. If false, user will only
+     #  be added to the groups specified in groups, removing them from all other groups.
+     append: true
+
+     # password_expire_max: Maximum number of days between password change
+     # Does not work on ansible 2.7.7 and python 3.7.3 :(
+<<<<<<< HEAD:1_create_user.yml
+     ###password_expire_max: 120
+=======
+     password_expire_max: 900000
+>>>>>>> bb686ad (Production commit #1):01_create_user_netdbuser.yaml
+
+     comment: 'Created with ansible'
+
+  - name: ШАГ 2 - Настройка мандатного контроля целостности (МКЦ) для пользователя '{{ username }}'
+    # astra-mic-control
+    ansible.builtin.command: pdpl-user '{{ username }}' -i 63
+
+#  - name: ШАГ 3 - Настройка уровня конфиденциальности для пользователя '{{ username }}'
+    # astra-mac-control
+#    ansible.builtin.command: usermac -c 0:0 '{{ username }}'

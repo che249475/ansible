@@ -1,0 +1,14 @@
+[Unit]
+Description=VNC Server for X11
+Requires=display-manager.service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/x11vnc -auth guess -forever -loop -noxdamage -repeat -rfbauth /etc/x11vnc.pwd -rfbport 5900 -shared -o /var/log/x11vnc.log
+ExecStop=/usr/bin/x11vnc -R stop
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

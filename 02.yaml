@@ -1,0 +1,23 @@
+---
+- name: Test connection to my servers
+  gather_facts: true
+  hosts: staging_servers
+  serial: 6
+  become: true
+
+
+  tasks:
+
+    - name: Simple ping
+      ansible.builtin.ping:
+
+    - name: Simple shell
+      ansible.builtin.shell: hostname && w
+      register: result
+
+    - name: Install htop on all hosts except 192.168.1.130
+      ansible.builtin.apt:
+        name: htop
+        state: present
+        update_cache: yes
+      when: '"ansible-130" not in result.stdout'

@@ -1,0 +1,28 @@
+---
+# Ansible will display the gathered facts, which can be extensive.
+# Filtering specific facts can make this more manageable.
+#
+#$ ansible staging_servers -m setup -a "filter=ansible_distribution"
+#
+# 172.16.140.12 | SUCCESS => {
+#     "ansible_facts": {
+#         "ansible_distribution": "Astra Linux",
+#         "discovered_interpreter_python": "/usr/bin/python3.11"
+#     },
+#     "changed": false
+
+- name: Gather and display specific facts
+  hosts: video_ALL
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Show sda controller type
+      ansible.builtin.debug:
+        var: ansible_facts['devices']['sda']['host']
+
+    - name: Show sdb controller type
+      ansible.builtin.debug:
+        var: ansible_facts['devices']['sdb']['host']
+
+
+#./storcli64 /c0 show

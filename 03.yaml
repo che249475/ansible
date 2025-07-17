@@ -1,0 +1,38 @@
+---
+
+- name: Playbook for Load Balancer initialization
+  gather_facts: true
+  hosts: site_loadbalancer
+  serial: 6
+  become: true
+
+  tasks:
+     - name: Install the OS packages
+       ansible.builtin.apt:
+         name:
+           - haproxy
+         state: present
+         update_cache: yes
+
+     - name: Copy haproxy configuration for Load Balancer service
+       ansible.builtin.template:
+         src: /home/berezinve/ansible_project/ansible_project/roles/common/files/haproxy.cfg
+         dest: /etc/haproxy/haproxy.cfg
+         owner: root
+         group: root
+         mode: u+rw,g=rw,o=r
+       notify:
+         - Restart Haproxy
+
+     - name: Start haproxy service
+       ansible.builtin.systemd:
+         state: started
+         enabled: yes
+         daemon_reload: yes
+         name: haproxy
+
+  handlers:
+   - name: Restart Haproxy
+     ansible.builtin.service:
+       name: haproxy
+       state: restarted

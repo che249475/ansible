@@ -1,0 +1,33 @@
+---
+
+- name: Loops Playbook
+  hosts: ansible-130
+  become: true
+
+
+  tasks:
+
+  - name: Loop -for- example
+    debug: msg="Hello {{ item }}"
+    loop:                         # with items - deprecated
+        - "Peter"
+        - "John"
+        - "Basil"
+
+  - name: Retrying task -until- certain condition is met
+    ansible.builtin.shell: echo -n Z >> myfile.txt && cat myfile.txt
+    register: output
+    until: output.stdout.find("ZZZZ") == false
+    retries: 10
+    delay: 2
+
+  - name: Print final output
+    debug:
+        var: output.stdout
+
+  - name: Install multiple packages
+    apt: name={{ item }} state=present
+    loop:                         # with items - deprecated
+        - python
+        - tree
+        - netcat
