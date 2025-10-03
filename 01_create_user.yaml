@@ -21,7 +21,7 @@
 
   vars:
     username: egorenkovpe
-    password: 98IrjRhjGfk
+    password: egorenkovpe
     # uid: 1005
     # ansible_become_password: "berezinve"
 

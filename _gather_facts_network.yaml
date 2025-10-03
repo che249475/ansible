@@ -1,0 +1,17 @@
+---
+- name: Gather and display specific facts
+  hosts: video_ALL
+#  hosts: 172.16.140.2
+  gather_facts: yes
+  become: true
+
+  tasks:
+    - name: Run a shell command
+      ansible.builtin.shell: lspci | grep -i 'network\|ethernet\|wireless' > /tmp/net
+      register: result
+
+    - name: Fetch files from remote nodes
+      ansible.builtin.fetch:
+        src:  /tmp/net
+        dest: /home/berezinve/ansible/net-{{ ansible_hostname }}
+        flat: yes
